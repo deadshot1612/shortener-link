@@ -1,8 +1,12 @@
+from dataclasses import field
+import email
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.utils.translation import gettext_lazy as _
+from django.forms import EmailInput
 from django import forms
 
-from account.models import Account
+
+from account.models import Account, UserConfirmCode
 
 
 class RegistrationForm(UserCreationForm, forms.ModelForm):
@@ -14,7 +18,8 @@ class RegistrationForm(UserCreationForm, forms.ModelForm):
 	email = forms.EmailField(
 		label=_("Email"),
 		required=True,
-		error_messages = {'required': _('Email is might be already exist.')}
+		error_messages = {'required': _('Email is might be already exist.')},
+		widget=EmailInput(attrs={'autocomplete': 'new-password'}),
 	)
 	password1 = forms.CharField(
         label=_("Password"),
@@ -35,13 +40,15 @@ class RegistrationForm(UserCreationForm, forms.ModelForm):
 
 	def __init__(self, *args, **kwargs) -> None:
 		super(RegistrationForm, self).__init__(*args, **kwargs)
-		self.fields['username'].widget.attrs.update({'class':'form-control','placeholder':'Enter Username'})
-		self.fields['email'].widget.attrs.update({'class':'form-control','placeholder':'Enter email'})
-		self.fields['password1'].widget.attrs.update({'class':'form-control','placeholder':'Enter password'})
-		self.fields['password2'].widget.attrs.update({'class':'form-control','placeholder':'Enter password confirmation'})
+		self.fields['username'].widget.attrs.update({'class':'login__input','placeholder':'Enter Username'})
+		self.fields['email'].widget.attrs.update({'class':'login__input','placeholder':'Enter email'})
+		self.fields['password1'].widget.attrs.update({'class':'login__input','placeholder':'Enter password'})
+		self.fields['password2'].widget.attrs.update({'class':'login__input','placeholder':'Enter password confirmation'})
 
 
 class UserForm(AuthenticationForm):
+	email = forms.CharField(widget=forms.TextInput(attrs={ "autofocus": True}))
+
 	password = forms.CharField(
         label=_("Password"),
         strip=False,
@@ -50,16 +57,28 @@ class UserForm(AuthenticationForm):
 
 	error_messages = {
         'invalid_login': _(
-            "Please enter a correct %(username)s and password. Note that both "
+            "Please enter a correct %(email)s and password. Note that both "
             "fields may be case-sensitive."
         ),
         'inactive': _("This account is inactive."),
     }
 	class Meta:
 		model = Account
-		fields = ('username', 'password')
+		fields = ('email', 'password')
 	def __init__(self, *args, **kwargs):
 		super(UserForm,self).__init__(*args,**kwargs)
-		self.fields['username'].widget.attrs.update({'class':'form-control','placeholder':'Username'})
-		self.fields['password'].widget.attrs.update({'class':'form-control','placeholder':'Password'})
+		self.fields.pop('username')
+		self.fields['email'].widget.attrs.update({'class':'login__input','placeholder':'Email or Username'})
+		self.fields['password'].widget.attrs.update({'class':'login__input','placeholder':'Password'})
 
+class LoginConfirmForm(forms.Form):
+
+	code = forms.IntegerField(
+		label=_("Input your code"),
+        widget=forms.NumberInput(),
+	)
+	field=('code')
+	
+	def __init__(self, *args, **kwargs):
+			super(LoginConfirmForm,self).__init__(*args,**kwargs)
+			self.fields['code'].widget.attrs.update({'class':'login__input','placeholder':'Code'})
