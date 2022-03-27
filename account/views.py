@@ -17,19 +17,16 @@ async def log_user_in(request):
         form = await sync_to_async(UserForm, thread_sensitive=False)(data=request.POST)
         if form.is_valid():
             email  = await sync_to_async(form.cleaned_data.get, thread_sensitive=False)('email')
-            password =await sync_to_async(form.cleaned_data.get, thread_sensitive=False)('password')
+            password = await sync_to_async(form.cleaned_data.get, thread_sensitive=False)('password')
             user = await sync_to_async(authenticate)(username=email, password=password)
             if user is not None:
-                if user.is_active:
                     code = create_random_code()
                     UserConfirmCode.objects.create(user=user, code=code)
                     current_site = await sync_to_async(get_current_site)(request)
                     send_email_on_login(current_site.domain, user.id, code)
                     return redirect("login-confirm", pk=user.pk)
-                else:
-                    error_messages = "User is not active. Check your email to verify accont"
             else:
-                error_messages = "Invalid email or password."
+                error_messages = "Invalid email or password. If all correct Check your email to verify account "
         else:
             error_messages = "Invalid email or password."
     else:
@@ -67,7 +64,6 @@ async def activate_user(request, uid, token):
         if generate_token.check_token(user, token):
             user.is_active = True
             await sync_to_async(user.save)()
-            await sync_to_async(login)(request, user)
             return redirect(reverse('login'))
     return await HttpResponse(content='Invalid activation link', status=401)
 
@@ -81,6 +77,7 @@ async def login_confirm(request, pk):
             user =  Account.objects.get(pk=pk)
             if UserConfirmCode.objects.filter(user=user, code=request.POST['code']).exists():
                 login(request,user)
+                await sync_to_async(UserConfirmCode.objects.filter(user=user, code=request.POST['code']).delete)()
                 return redirect('homepage')
     else:
         form = await sync_to_async(LoginConfirmForm, thread_sensitive=False)()

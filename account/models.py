@@ -48,3 +48,4 @@ class Account(AbstractBaseUser, PermissionsMixin):
 class UserConfirmCode(models.Model):
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     code = models.PositiveIntegerField()
+    sended = models.DateTimeField(default=timezone.now)

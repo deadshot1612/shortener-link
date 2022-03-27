@@ -1,15 +1,7 @@
-import asyncio
+from datetime import datetime, timedelta
 
-async def foo(a):
-    if a:
-        print(a)
-    else:
-        print("Nothing")
-
-
-
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    a = 1
-    loop.run_until_complete(foo(a))
-    loop.run_until_complete(foo(a))
+p1 = datetime.now()
+p2 = datetime.now()
+p2 = p2 +  timedelta(minutes=5)
+if p2 > p1:
+    print(p2)
