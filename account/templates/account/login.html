@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+
+{% block body %}
+<div class="container">
+	<div class="screen">
+		<div class="screen__content">
+      	<form  class="login" method="post" action="{% url 'login'  %}">
+        {% csrf_token %}
+		{% if error_message %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 4%;"> {{error_message}}
+              <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+            {% endif %}
+				<div class="login__field">
+					<i class="login__icon fas fa-user"></i>
+					{{form.email}}
+				</div>
+				<div class="login__field">
+					<i class="login__icon fas fa-lock"></i>
+					{{form.password}}
+				</div>
+				<button  type="submit" class="button login__submit">
+					<span class="button__text">Log In Now</span>
+					<i class="button__icon fas fa-chevron-right"></i>
+				</button>				
+			</form>
+			<p class="col-sm-12 text-center">Don't have an account? <a class="text-info" href="{% url 'register' %}">Create an account.</a></p>
+		</div>
+		        
+		<div class="screen__background">
+			<span class="screen__background__shape screen__background__shape4"></span>
+			<span class="screen__background__shape screen__background__shape3"></span>		
+			<span class="screen__background__shape screen__background__shape2"></span>
+			<span class="screen__background__shape screen__background__shape1"></span>
+{% endblock body %}

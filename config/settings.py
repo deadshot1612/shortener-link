@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import json
 import os
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'account',
-    'short_link'
+    'short_link',
 ]
 
 MIDDLEWARE = [
@@ -81,9 +82,6 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
     },
     {
@@ -126,7 +124,16 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'Asia/Tashkent'
 
-
+CELERYBEAT_SCHEDULE = {
+    "check_code_status": {
+        "task": "account.tasks.check_code_status",
+        "schedule": crontab(minute="*/1"),
+    },
+    "check_urls_status": {
+        "task": "account.tasks.check_urls_status",
+        "schedule": crontab(hour="*/24"),
+    },
+}
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
@@ -142,4 +149,4 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 AUTH_USER_MODEL = 'account.Account'
-
+AUTHENTICATION_BACKENDS = ['account.backends.EmailBackend'] 
