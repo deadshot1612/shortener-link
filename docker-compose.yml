@@ -1,0 +1,67 @@
+version: '3.4'
+
+services:
+
+  static_collector:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - app-volumes:/app
+    entrypoint: python
+    command: ["manage.py","collectstatic","--noinput"]
+  
+  redis:
+    env_file:
+      - .env
+    image: bitnami/redis
+
+
+  celery:
+    build: .
+    volumes:
+      - app-volumes:/app
+    env_file:
+      - .env
+    command: celery -A config worker --beat -l info
+    depends_on:
+        - redis
+
+  migrator:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - app-volumes:/app
+    entrypoint: python
+    command: ["manage.py", "migrate"]
+
+  createsuperuser:
+    build: .
+    env_file:
+      - .env
+    volumes:
+      - app-volumes:/app
+    entrypoint: python
+    command: ["manage.py", "create_superuser_with_password", "--username", $DJANGO_SUPERUSER_USERNAME  ,"--password",  $DJANGO_SUPERUSER_PASSWORD , "--email", "$DJANGO_SUPERUSER_EMAIL" , "--preserve"]
+    depends_on:
+      - migrator
+
+  web:
+    build: .
+    ports:
+    - 8008:8008
+    - 8000:8000
+    volumes:
+      - app-volumes:/app
+    env_file:
+      - .env
+    command: ["uvicorn", "--reload", "config.asgi:application" ,"--host", "0.0.0.0" , ]
+    depends_on:
+      - static_collector
+      - migrator
+      - createsuperuser
+      - redis
+
+volumes:
+  app-volumes:

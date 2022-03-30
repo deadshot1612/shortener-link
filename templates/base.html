@@ -25,7 +25,28 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   </head>
   <body>
-   
+    <nav class="navbar navbar-fixed-top navbar-expand-lg navbar-dark bg-dark">
+      <a class="navbar-brand" style="margin-left: 10%;" href="{% url 'homepage' %}">Shortener</a>
+      <a class="navbar-brand" href="{% url 'all_links' %}">My Links</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        {% if not user.is_authenticated %}
+        <ul class="navbar-nav" style="margin-left: 75%;">
+          <li class="nav-item rounded active">
+            <a href="{% url 'login' %}"><button class="btn btn-outline-light"><i class="fas fa-sign-out-alt">Login</i></button></a>
+          </li>
+          <li class="nav-item rounded active">
+            <a href="{% url 'register' %}"><button class="btn btn-outline-light" style="margin-left: 5%;"><i class="fas fa-sign-out-alt">SignUp</i></button></a>
+          </li>
+        </ul>
+        {% else %}
+          <ul class="navbar-nav mr-auto" style="margin-left: 75%;">
+            <li class="nav-item rounded active">
+              <a href="{% url 'logout' %}"><button class="btn btn-outline-light"><i class="fas fa-sign-out-alt">Logout</i></button></a>
+            </li>
+          </ul>
+        {% endif %}
+      </div>
+    </nav>
     {% block body %} 
    
    
