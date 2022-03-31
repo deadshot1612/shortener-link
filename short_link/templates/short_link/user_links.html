@@ -7,17 +7,17 @@
 
 body {
   font-family: 'Open Sans', sans-serif;
-  font-weight: 300;
+  font-weight: 310;
   line-height: 1.42em;
   color:#A7A1AE;
   background-color:#1F2739;
 }
 
 h1 {
+  text-align: center;
   font-size:3em; 
   font-weight: 300;
   line-height:1em;
-  text-align: center;
   color: #4DC3FA;
 }
 
@@ -119,17 +119,35 @@ h2 a {
     <table id="somerow" class="container">
         <thead>
             <tr>
-                <th><h1>Short URLS</h1></th>
-                <th><h1>Long Urls</h1></th>
+                <th><h1 style="text-align: center;">Short URLS</h1></th>
+                <th><h1 style="text-align: center;">Long Urls</h1></th>
+                <th></th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for url in all_urls %}
             <tr>
-                <td id="myInput">{{domain}}/{{url.short_url}}</td>
-                <td>{{url.long_url}}</td>
-                <td><button class="otherButton">Copy</button></td>
-                <td><button user="{{ user.id }}"  data-object-id="{{ url.id }}">Remove</button></td>
+                <td style="text-align: center;" id="myInput">{{domain}}/{{url.short_url}}</td>
+                <td style="text-align: center;">{{url.long_url}}</td>
+                <td style="text-align: center;"><button style="font-size: 36px;
+                      background-color: transparent;
+                      background-repeat: no-repeat;
+                      border: none;
+                      cursor: pointer;
+                      overflow: hidden;
+                      outline: none;" 
+                class="otherButton"><i class="fa fa-copy icon-4x"></i></button></td>
+                <td style="text-align: center;"><button name='remove' id="remove"  user="{{ user.id }}"  data-object-id="{{ url.id }}" 
+                      style="font-size:36px;
+                      margin-right: 10%;
+                      background-color: transparent;
+                      background-repeat: no-repeat;
+                      border: none;
+                      cursor: pointer;
+                      overflow: hidden;
+                      outline: none;"
+                  ><i class="fa fa-trash"></i></button></td>
             </tr>
             {% endfor %}
         </tbody>
@@ -142,7 +160,7 @@ for (var i = 0; i < a.length; i++) {
   a[i].addEventListener('click', function() {
     var b = this.parentNode.parentNode.cells[0].textContent;
     copyToClipboard(b);
-    alert(b);
+    alert( 'Copied to clipboard');
   });
 }
 
@@ -156,7 +174,7 @@ function copyToClipboard(text) {
 }
 </script>
 <script>
-  $('button').on('click', function(){
+$('#remove').on('click', function(){
     let confirmation = confirm("are you sure you want to remove the item?");
     if (confirmation) {
       let object_id = $(this).attr('data-object-id');
